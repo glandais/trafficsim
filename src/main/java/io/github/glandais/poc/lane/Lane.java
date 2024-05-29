@@ -5,9 +5,7 @@ import io.github.glandais.poc.Point;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 @RequiredArgsConstructor
@@ -18,13 +16,11 @@ public abstract class Lane {
 
     final long id = ID_GENERATOR.getAndIncrement();
 
-    Map<Long, Car> cars = new HashMap<>();
+    Map<Long, Car> cars = Collections.synchronizedMap(new HashMap<>());
 
     final double maxSpeed;
 
-    final List<Lane> neighborhood;
-
-    final List<Lane> nextLanes;
+    final List<Lane> nextLanes = new ArrayList<>();
 
     public abstract Point getCoords(double abs);
 

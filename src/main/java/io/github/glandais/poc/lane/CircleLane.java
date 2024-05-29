@@ -14,9 +14,9 @@ public class CircleLane extends Lane {
     private final double angleStart;
     private final double angleEnd;
 
-    public CircleLane(double maxSpeed, List<Lane> neighborhood, List<Lane> nextLanes,
+    public CircleLane(double maxSpeed,
                       Point center, double radius, double angleStart, double angleEnd) {
-        super(maxSpeed, neighborhood, nextLanes);
+        super(maxSpeed);
         this.center = center;
         this.radius = radius;
         this.angleStart = angleStart;
