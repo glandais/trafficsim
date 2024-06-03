@@ -30,4 +30,6 @@ public abstract class Lane {
         this.cars.put(car.getId(), car);
     }
 
+    public abstract List<Point> getPoints();
+
 }

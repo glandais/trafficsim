@@ -27,4 +27,8 @@ public class StraigthLane extends Lane {
         );
     }
 
+    @Override
+    public List<Point> getPoints() {
+        return List.of(from, to);
+    }
 }

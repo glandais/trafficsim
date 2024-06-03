@@ -1,11 +1,12 @@
 package io.github.glandais.poc;
 
-import io.github.glandais.poc.lane.CircleLane;
 import io.github.glandais.poc.lane.Lane;
-import io.github.glandais.poc.lane.StraigthLane;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
@@ -15,11 +16,48 @@ public class DrawingCanvas extends JPanel implements Runnable {
     private final BufferedImage bufferedImage;
     private final Graphics2D bufferedGraphics;
 
+    double scale = 0.5;
+    int dx = 0;
+    int dy = 0;
+
+    int startX = 0;
+    int startY = 0;
+
     public DrawingCanvas(int width, int height, Sim sim) {
         this.bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         this.bufferedGraphics = bufferedImage.createGraphics();
         this.bufferedGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         this.sim = sim;
+
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                startX = e.getX();
+                startY = e.getY();
+            }
+        });
+        addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                dx = dx + (e.getX() - startX);
+                dy = dy + (e.getY() - startY);
+                startX = e.getX();
+                startY = e.getY();
+            }
+        });
+        addMouseWheelListener(new MouseAdapter() {
+
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                double delta = 0.05f * e.getPreciseWheelRotation();
+                scale += delta;
+                scale = Math.max(scale, 0.05);
+                scale = Math.min(scale, 20.0);
+                revalidate();
+                repaint();
+            }
+
+        });
     }
 
     public void start() {
@@ -80,38 +118,32 @@ public class DrawingCanvas extends JPanel implements Runnable {
         g2d.setColor(Color.GREEN);
         List<Lane> lanes = sim.getLanes();
         for (Lane lane : lanes) {
-            if (lane instanceof StraigthLane straigthLane) {
+            List<Point> points = lane.getPoints();
+            for (int i = 0; i < points.size() - 1; i++) {
                 g2d.drawLine(
-                        (int) straigthLane.getFrom().x(),
-                        getHeight() - (int) straigthLane.getFrom().y(),
-                        (int) straigthLane.getTo().x(),
-                        getHeight() - (int) straigthLane.getTo().y()
+                        x(points.get(i).x()),
+                        y(points.get(i).y()),
+                        x(points.get(i + 1).x()),
+                        y(points.get(i + 1).y())
                 );
-            } else {
-                int c = 1 + (int) (lane.getLength() / 10.0);
-                double da = lane.getLength() / c;
-                for (int i = 0; i < c; i++) {
-                    double sa = da * i;
-                    double ea = da * (i + 1);
-                    Point sp = lane.getCoords(sa);
-                    Point ep = lane.getCoords(ea);
-                    g2d.drawLine(
-                            (int) sp.x(),
-                            getHeight() - (int) sp.y(),
-                            (int) ep.x(),
-                            getHeight() - (int) ep.y()
-                    );
-                }
             }
         }
         g2d.setFont(new Font("TimesRoman", Font.PLAIN, 20));
         List<CarPos> carPositions = sim.getCarPositions();
         for (CarPos carPosition : carPositions) {
             g2d.setColor(getColorFromSpeed(carPosition.speed()));
-            int x = ((int) (carPosition.pos().x())) - 4;
-            int y = (getHeight() - (int) (carPosition.pos().y())) - 4;
+            int x = x(carPosition.pos().x()) - 4;
+            int y = y(carPosition.pos().y()) - 4;
             g2d.fillOval(x, y, 8, 8);
         }
+    }
+
+    private int x(double v) {
+        return (int) (dx + v * scale);
+    }
+
+    private int y(double v) {
+        return dy + getHeight() - (int) (v * scale);
     }
 
     private Color getColorFromSpeed(double speed) {

@@ -38,7 +38,9 @@ public class Car {
         while (overflow > lane.getLength()) {
             overflow = overflow - lane.getLength();
             this.lane.getCars().remove(this.getId());
-            this.lane = this.lane.getNextLanes().get(R.nextInt(this.lane.getNextLanes().size()));
+            if (!this.lane.getNextLanes().isEmpty()) {
+                this.lane = this.lane.getNextLanes().get(R.nextInt(this.lane.getNextLanes().size()));
+            }
             this.lane.getCars().put(this.getId(), this);
         }
         this.laneAbs = overflow;
@@ -58,6 +60,7 @@ public class Car {
             a = -10;
         }
         speed = speed + seconds * a;
+        speed = Math.max(0.0, speed);
         setLaneAbs(laneAbs + (speed * 1000.0 / 3600.0) * seconds);
     }
 
@@ -97,7 +100,7 @@ public class Car {
     private static double getDistStop(double reflex, Car car) {
         double dist = reflex * (car.getSpeed() * 1000.0 / 3600.0);
 
-        return dist + car.speed * car.speed / (7.2 * 10);
+        return 2.0 + dist + car.speed * car.speed / (7.2 * 10);
 
 //        double s = car.getSpeed();
 //        double d = 0.1;

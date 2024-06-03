@@ -4,6 +4,7 @@ import io.github.glandais.poc.interchange.Interchange;
 import io.github.glandais.poc.lane.CircleLane;
 import io.github.glandais.poc.lane.Lane;
 import io.github.glandais.poc.lane.StraigthLane;
+import io.github.glandais.poc.osm.Osm;
 import lombok.Getter;
 
 import java.security.SecureRandom;
@@ -23,7 +24,9 @@ public class Sim {
 
     public Sim() {
 
-        lanes.addAll(Interchange.getInterchange());
+//        lanes.addAll(Interchange.getInterchange());
+
+        lanes.addAll(Osm.loadLanes("map5.osm"));
 
         // createNetwork1();
 
@@ -32,7 +35,7 @@ public class Sim {
             totlength = totlength + lane.getLength();
         }
 
-        int c = 500;
+        int c = 5000;
         for (int i = 0; i < c; i++) {
             double l = r.nextDouble(totlength);
             double t = 0.0;

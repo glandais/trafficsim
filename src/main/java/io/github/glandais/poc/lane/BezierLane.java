@@ -4,7 +4,7 @@ import io.github.glandais.poc.Point;
 import lombok.Getter;
 
 @Getter
-public class BezierLane extends Lane {
+public class BezierLane extends SimpleDrawableLine {
 
     private static final double TOLERANCE = 1e-5;
 

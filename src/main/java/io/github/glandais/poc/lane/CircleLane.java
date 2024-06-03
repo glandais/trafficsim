@@ -6,7 +6,7 @@ import lombok.Getter;
 import java.util.List;
 
 @Getter
-public class CircleLane extends Lane {
+public class CircleLane extends SimpleDrawableLine {
 
     private final double length;
     private final Point center;
